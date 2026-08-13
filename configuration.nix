@@ -28,10 +28,14 @@
   nix-homebrew = {
     enable = true;
     inherit user;
+    # Adopt the pre-existing /opt/homebrew instead of demanding a clean prefix.
+    # Replaces the brew source tree with the nix-managed one; Cellar and
+    # Caskroom (i.e. installed packages) are kept.
+    autoMigrate = true;
   };
   homebrew = {
     enable = true;
-    onActivation.cleanup = "zap";  # remove anything not listed here
+    onActivation.cleanup = "none";  # keep undeclared packages ("zap" would remove them)
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
     brews = [
