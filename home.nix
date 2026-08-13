@@ -24,15 +24,16 @@ in
 
   programs.zsh = {
     enable = true;
-    autosuggestion.enable = true;      # ghost text from history
-    syntaxHighlighting.enable = true;  # commands turn green when valid
+    # The prompt and plugins are sourced by hand inside the WezTerm guard below
+    # instead, so Terminal.app and the VS Code terminal keep the plain shell
+    # they had before Nix. Same reason there are no shellAliases here.
+    autosuggestion.enable = false;
+    syntaxHighlighting.enable = false;
     # Sourced from ~/.zshenv, so it applies to non-interactive shells too.
     envExtra = ''
       [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
     '';
     initContent = ''
-      bindkey '^f' autosuggest-accept
-
       # Toolchains installed outside Nix. pyenv must init after its bin is on PATH.
       export PATH="$HOME/.local/share/sentry-devenv/bin:$PATH"
       export PATH="$HOME/.pyenv/bin:$PATH"
@@ -45,20 +46,32 @@ in
       [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
       export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+
+      # Everything below is WezTerm-only. WezTerm exports TERM_PROGRAM to every
+      # shell it spawns; Terminal.app sets Apple_Terminal and VS Code sets vscode.
+      if [[ $TERM_PROGRAM == "WezTerm" ]]; then
+        [[ $TERM != "dumb" ]] && eval "$(${pkgs.starship}/bin/starship init zsh)"
+
+        source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+        bindkey '^f' autosuggest-accept
+
+        alias ..='cd ..'
+        alias add='git add .'
+        alias push='git push'
+        alias pull='git pull'
+        alias m='git switch main'
+        alias cc='claude --dangerously-skip-permissions'
+        alias co='codex --full-auto'
+
+        # zsh-syntax-highlighting must be sourced last to wrap the widgets above.
+        source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+      fi
     '';
-    shellAliases = {
-      ".." = "cd ..";
-      add = "git add .";
-      push = "git push";
-      pull = "git pull";
-      m = "git switch main";
-      cc = "claude --dangerously-skip-permissions";
-      co = "codex --full-auto";
-    };
   };
 
   programs.starship = {
     enable = true;
+    enableZshIntegration = false;  # sourced only under the WezTerm guard above
     settings = {
       add_newline = false;
       format = "$directory$git_branch$git_status$cmd_duration$line_break$character";
