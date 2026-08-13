@@ -26,8 +26,25 @@ in
     enable = true;
     autosuggestion.enable = true;      # ghost text from history
     syntaxHighlighting.enable = true;  # commands turn green when valid
+    # Sourced from ~/.zshenv, so it applies to non-interactive shells too.
+    envExtra = ''
+      [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+    '';
     initContent = ''
       bindkey '^f' autosuggest-accept
+
+      # Toolchains installed outside Nix. pyenv must init after its bin is on PATH.
+      export PATH="$HOME/.local/share/sentry-devenv/bin:$PATH"
+      export PATH="$HOME/.pyenv/bin:$PATH"
+      eval "$(pyenv init -)"
+      eval "$(pyenv virtualenv-init -)"
+      export PATH="$HOME/.local/bin:$PATH"
+
+      export BUN_INSTALL="$HOME/.bun"
+      export PATH="$BUN_INSTALL/bin:$PATH"
+      [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+      export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
     '';
     shellAliases = {
       ".." = "cd ..";
