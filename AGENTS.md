@@ -2,7 +2,7 @@
 
 Deliberate decisions in this repo - do NOT silently revert them:
 
-- `homebrew.onActivation.cleanup = "zap"` in `configuration.nix` is intentional. It forces the good habit of declaring every Homebrew package in the Nix config instead of installing things ad-hoc, which keeps the machine reproducible. Do not soften it to `uninstall` or `none`. Users are warned about its effect in README.md; this note is for anyone tempted to change the setting itself.
+- `homebrew.onActivation.cleanup = "none"` in `configuration.nix` is intentional and pairs with `nix-homebrew.autoMigrate = true`. This fork adopts a pre-existing `/opt/homebrew` rather than starting from a clean prefix, so packages installed by hand predate the config. `"zap"` (the upstream value) would uninstall every one of them on the first switch. Do not restore `"zap"` or `"uninstall"` without first declaring the machine's existing brews and casks in the `brews`/`casks` arrays.
 - Never commit `.no-mistakes/` validation evidence to this public repo. `.no-mistakes/` is gitignored; if a validation pipeline stages evidence into a branch, drop it before merging.
 
 ## Maintaining this file

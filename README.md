@@ -40,7 +40,7 @@ cd dotfiles
 ```
 
 Before you run it: review "Make it yours" below.
-Change the host label or CPU architecture if needed, and read the Homebrew cleanup warning.
+Change the host label or CPU architecture if needed, and read the Homebrew cleanup note.
 `bootstrap.sh` applies the config to your machine, so do this first.
 
 ```sh
@@ -105,10 +105,9 @@ programs.git = {
 };
 ```
 
-**Homebrew cleanup warning:** `configuration.nix` sets `homebrew.onActivation.cleanup = "zap"`.
-That means every time you switch, Homebrew removes any package or cask on your machine that isn't listed in the `brews` and `casks` arrays in `configuration.nix`.
-If you already have Homebrew stuff installed that isn't in that list, the first switch will uninstall it.
-Read through `brews` and `casks` before you run `bootstrap.sh` or `rebuild.sh` for the first time, and add anything you want to keep.
+**Homebrew cleanup:** `configuration.nix` sets `homebrew.onActivation.cleanup = "none"`, so switching never removes packages you installed by hand. This pairs with `nix-homebrew.autoMigrate = true`, which adopts an existing `/opt/homebrew` instead of demanding a clean prefix.
+
+The trade-off is that undeclared packages stay on the machine and the config is not a complete picture of what's installed. If you want that guarantee, add everything you use to the `brews` and `casks` arrays first, then set `cleanup = "zap"` - at which point every switch uninstalls anything not listed.
 
 **About `herdr`:** it's in the `brews` list.
 It's a real public Homebrew formula (`brew info herdr` finds it in homebrew-core, no tap needed), so it will install fine.
