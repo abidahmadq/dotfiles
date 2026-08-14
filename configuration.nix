@@ -12,6 +12,11 @@
     home = "/Users/${user}";
   };
   system.stateVersion = 6;
+  # nix-darwin defaults promptInit to `prompt suse`, which renders
+  # `user@host:~/ >` in every shell that reads /etc/zshrc - Terminal.app, VS
+  # Code, ssh. Pin it to the stock macOS prompt instead. WezTerm still gets
+  # Starship on top, because ~/.zshrc is sourced after /etc/zshrc.
+  programs.zsh.promptInit = "PS1='%n@%m %1~ %% '";
   system.defaults = {
     NSGlobalDomain = {
       AppleInterfaceStyle = "Dark";
